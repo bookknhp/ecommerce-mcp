@@ -7,214 +7,144 @@ Provides tools for AI to manage products, coupons, orders, and generate reports
 import json
 import subprocess
 import sys
-from database import Database
+import logging
+from live_bridge import call_live_api
 
-db = Database()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Define available MCP tools
 TOOLS = {
-    # PRODUCT TOOLS
-    "product_update_price": {
+    "get_dashboard_stats": {
+        "description": "Get overall system dashboard statistics",
+        "input_schema": {"type": "object", "properties": {}}
+    },
+    "list_products": {
+        "description": "List all current products",
+        "input_schema": {"type": "object", "properties": {}}
+    },
+    "get_low_stock_products": {
+        "description": "Get list of products with low stock",
+        "input_schema": {"type": "object", "properties": {}}
+    },
+    "update_product_price": {
         "description": "Update product price",
         "input_schema": {
             "type": "object",
             "properties": {
-                "product_id": {"type": "integer", "description": "Product ID"},
-                "new_price": {"type": "number", "description": "New price in THB"}
+                "product_id": {"type": "integer"},
+                "price": {"type": "number"}
             },
-            "required": ["product_id", "new_price"]
+            "required": ["product_id", "price"]
         }
     },
-    "product_update_stock": {
+    "update_product_stock": {
         "description": "Update product stock quantity",
         "input_schema": {
             "type": "object",
             "properties": {
-                "product_id": {"type": "integer", "description": "Product ID"},
-                "quantity": {"type": "integer", "description": "New stock quantity"}
+                "product_id": {"type": "integer"},
+                "quantity": {"type": "integer"}
             },
             "required": ["product_id", "quantity"]
         }
     },
-    "product_delete": {
-        "description": "Delete a product (only if no orders)",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "product_id": {"type": "integer", "description": "Product ID to delete"}
-            },
-            "required": ["product_id"]
-        }
-    },
-    "product_low_stock": {
-        "description": "Get all products with low stock",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "threshold": {"type": "integer", "description": "Stock threshold (default: 5)"}
-            }
-        }
-    },
-    
-    # COUPON TOOLS
-    "coupon_create": {
-        "description": "Create a new coupon for promotions",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "code": {"type": "string", "description": "Coupon code (e.g., SUMMER20)"},
-                "name": {"type": "string", "description": "Coupon name"},
-                "discount_type": {"type": "string", "enum": ["PERCENTAGE", "FIXED"], "description": "Discount type"},
-                "discount_value": {"type": "number", "description": "Discount value"},
-                "min_order": {"type": "number", "description": "Minimum order value"},
-                "max_uses": {"type": "integer", "description": "Max total uses"},
-                "expiry_days": {"type": "integer", "description": "Days until expiry"}
-            },
-            "required": ["code", "name", "discount_type", "discount_value"]
-        }
-    },
-    "coupon_cleanup_expired": {
-        "description": "Mark all expired coupons as expired",
+    "get_sales_analytics": {
+        "description": "Get sales analytics report",
         "input_schema": {"type": "object", "properties": {}}
     },
-    "coupon_disable": {
-        "description": "Disable a specific coupon",
+    "get_profit_report": {
+        "description": "Generate product profitability report",
+        "input_schema": {"type": "object", "properties": {}}
+    },
+    "create_coupon": {
+        "description": "Create a new coupon",
         "input_schema": {
             "type": "object",
             "properties": {
-                "coupon_id": {"type": "integer", "description": "Coupon ID"}
+                "code": {"type": "string"},
+                "name": {"type": "string"},
+                "type": {"type": "string", "enum": ["PERCENTAGE", "FIXED"]},
+                "value": {"type": "number"}
             },
-            "required": ["coupon_id"]
+            "required": ["code", "name", "type", "value"]
         }
     },
-    
-    # ORDER TOOLS
-    "order_update_status": {
+    "update_order_status": {
         "description": "Update order status",
         "input_schema": {
             "type": "object",
             "properties": {
-                "order_id": {"type": "integer", "description": "Order ID"},
-                "status": {"type": "string", "enum": ["pending", "processing", "shipped", "delivered", "cancelled"]}
+                "order_id": {"type": "integer"},
+                "status": {"type": "string"}
             },
             "required": ["order_id", "status"]
         }
     },
-    "order_update_payment": {
-        "description": "Update order payment status",
+    "create_product": {
+        "description": "Create a new product with details",
         "input_schema": {
             "type": "object",
             "properties": {
-                "order_id": {"type": "integer", "description": "Order ID"},
-                "payment_status": {"type": "string", "enum": ["unpaid", "paid", "refunded"]}
+                "name": {"type": "string"},
+                "price": {"type": "number"},
+                "description": {"type": "string"},
+                "stock": {"type": "integer"},
+                "category_id": {"type": "integer"}
             },
-            "required": ["order_id", "payment_status"]
-        }
-    },
-    
-    # REPORTING TOOLS
-    "report_sales": {
-        "description": "Generate sales report (optional date range)",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
-                "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"}
-            }
-        }
-    },
-    "report_products": {
-        "description": "Generate product profitability report",
-        "input_schema": {"type": "object", "properties": {}}
-    },
-    
-    # ALERT TOOLS
-    "get_alerts": {
-        "description": "Get current system alerts (low stock, unpaid orders, etc)",
-        "input_schema": {"type": "object", "properties": {}}
-    },
-    
-    # MAINTENANCE TOOLS
-    "backup_database": {
-        "description": "Create a database backup",
-        "input_schema": {"type": "object", "properties": {}}
-    },
-    "cleanup_old_logs": {
-        "description": "Clean up old database logs",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "days": {"type": "integer", "description": "Delete logs older than N days (default: 30)"}
-            }
+            "required": ["name", "price"]
         }
     }
 }
 
 
-def execute_tool(tool_name, arguments):
-    """Execute a specific tool with given arguments"""
-    try:
-        if tool_name == "product_update_price":
-            return db.update_product_price(arguments["product_id"], arguments["new_price"])
-        
-        elif tool_name == "product_update_stock":
-            return db.update_product_stock(arguments["product_id"], arguments["quantity"])
-        
-        elif tool_name == "product_delete":
-            return db.delete_product(arguments["product_id"])
-        
-        elif tool_name == "product_low_stock":
-            threshold = arguments.get("threshold", 5)
-            products = db.get_low_stock_products(threshold)
-            return {"success": True, "data": products, "count": len(products)}
-        
-        elif tool_name == "coupon_create":
-            return db.create_coupon(
-                code=arguments["code"],
-                name=arguments["name"],
-                discount_type=arguments["discount_type"],
-                discount_value=arguments["discount_value"],
-                min_order=arguments.get("min_order", 0),
-                max_uses=arguments.get("max_uses"),
-                expiry_days=arguments.get("expiry_days", 30)
-            )
-        
-        elif tool_name == "coupon_cleanup_expired":
-            return db.delete_expired_coupons()
-        
-        elif tool_name == "coupon_disable":
-            return db.disable_coupon(arguments["coupon_id"])
-        
-        elif tool_name == "order_update_status":
-            return db.update_order_status(arguments["order_id"], arguments["status"])
-        
-        elif tool_name == "order_update_payment":
-            return db.update_order_payment_status(arguments["order_id"], arguments["payment_status"])
-        
-        elif tool_name == "report_sales":
-            return db.export_sales_report(
-                arguments.get("start_date"),
-                arguments.get("end_date")
-            )
-        
-        elif tool_name == "report_products":
-            return db.export_product_report()
-        
-        elif tool_name == "get_alerts":
-            return db.get_alerts()
-        
-        elif tool_name == "backup_database":
-            return db.backup_database()
-        
-        elif tool_name == "cleanup_old_logs":
-            days = arguments.get("days", 30)
-            return db.cleanup_old_logs(days)
-        
-        else:
-            return {"success": False, "error": f"Unknown tool: {tool_name}"}
+def execute_tool(name, args):
+    """Execute tool by name with arguments (Now using Live API)"""
+    logger.info(f"Executing tool {name} with args {args}")
     
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+    if name == "get_dashboard_stats":
+        return call_live_api("get_admin_dashboard_summary")
+    
+    elif name == "list_products":
+        return call_live_api("get_products")
+    
+    elif name == "get_low_stock_products":
+        return call_live_api("get_products", {"stock_lt": 10})
+    
+    elif name == "update_product_price":
+        return call_live_api("admin_update_product_price", {"id": args.get("product_id"), "price": args.get("price")}, "POST")
+    
+    elif name == "update_product_stock":
+        return call_live_api("admin_update_product_stock", {"id": args.get("product_id"), "quantity": args.get("quantity")}, "POST")
+    
+    elif name == "get_sales_analytics":
+        return call_live_api("get_admin_sales_over_time")
+    
+    elif name == "get_profit_report":
+        return call_live_api("get_admin_product_profit_report")
+    
+    elif name == "create_coupon":
+        return call_live_api("admin_create_coupon", {
+            "code": args.get("code"), 
+            "name": args.get("name"),
+            "type": args.get("type", "PERCENTAGE"),
+            "value": args.get("value")
+        }, "POST")
+    
+    elif name == "update_order_status":
+        return call_live_api("admin_update_order_status", {"id": args.get("order_id"), "status": args.get("status")}, "POST")
+    
+    elif name == "create_product":
+        return call_live_api("admin_create_product", {
+            "name": args.get("name"),
+            "price": args.get("price"),
+            "description": args.get("description", ""),
+            "stock_quantity": args.get("stock", 0),
+            "category_id": args.get("category_id", 1)
+        }, "POST")
+    
+    else:
+        return {"success": False, "error": f"Tool {name} not implemented for Live API"}
 
 
 def list_tools():
