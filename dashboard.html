@@ -389,16 +389,24 @@
                 const data = await response.json();
                 
                 loading.remove();
-                const aiMsg = document.createElement('div');
-                aiMsg.className = 'ai-bubble message p-4 text-sm text-slate-200 shadow-md';
-                aiMsg.innerHTML = data.success ? data.reply.replace(/\n/g, '<br>') : `❌ ขออภัย: ${data.error}`;
-                messagesContainer.appendChild(aiMsg);
+                if (data.success) {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'ai-bubble message p-4 text-sm text-slate-200 shadow-md';
+                    aiMsg.innerHTML = data.reply.replace(/\n/g, '<br>');
+                    messagesContainer.appendChild(aiMsg);
+                } else {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'ai-bubble message p-4 text-sm text-rose-400 shadow-md border border-rose-900/50';
+                    errorMsg.textContent = `❌ AI Error: ${data.error}`;
+                    messagesContainer.appendChild(errorMsg);
+                }
 
                 if (text.includes('แก้') || text.includes('เปลี่ยน') || text.includes('สร้าง') || text.includes('อัพเดท')) {
                     setTimeout(loadDashboard, 1000);
                 }
             } catch (err) {
-                loading.textContent = '❌ ขัดข้อง: ไม่สามารถติดต่อ AI ได้';
+                loading.textContent = `❌ ขัดข้อง: ${err.message}`;
+                console.error("Chat Error:", err);
             }
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
