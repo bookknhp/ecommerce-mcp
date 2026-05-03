@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce MCP Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <h1 class="text-3xl font-bold">📊 E-Commerce Dashboard</h1>
+                <p class="text-blue-100 mt-2">AI-Powered Analytics & Insights</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            <!-- Loading State -->
+            <div id="loading" class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p class="text-gray-600 mt-2">กำลังโหลดข้อมูล...</p>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div id="dashboard" style="display: none;">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Revenue -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">ยอดรวมทั้งหมด</p>
+                                <p class="text-2xl font-bold text-blue-600" id="total_revenue">-</p>
+                            </div>
+                            <div class="text-4xl text-blue-200">💰</div>
+                        </div>
+                    </div>
+
+                    <!-- Total Orders -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">คำสั่งซื้อทั้งหมด</p>
+                                <p class="text-2xl font-bold text-green-600" id="total_orders">-</p>
+                            </div>
+                            <div class="text-4xl text-green-200">📦</div>
+                        </div>
+                    </div>
+
+                    <!-- Profit -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">กำไรสุทธิ</p>
+                                <p class="text-2xl font-bold text-purple-600" id="total_profit">-</p>
+                            </div>
+                            <div class="text-4xl text-purple-200">📈</div>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Alert -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">⚠️ Stock ต่ำ</p>
+                                <p class="text-2xl font-bold text-red-600" id="low_stock_count">-</p>
+                            </div>
+                            <div class="text-4xl text-red-200">🚨</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Low Stock Products -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Low Stock Table -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-bold mb-4">🚨 สินค้า Stock ต่ำ</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 border-b">
+                                    <tr>
+                                        <th class="text-left p-2">สินค้า</th>
+                                        <th class="text-center p-2">Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="low_stock_table">
+                                    <tr><td colspan="2" class="text-center p-4 text-gray-500">-</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-bold mb-4">📋 คำสั่งซื้อล่าสุด</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 border-b">
+                                    <tr>
+                                        <th class="text-left p-2">Order ID</th>
+                                        <th class="text-right p-2">ยอดเงิน</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent_orders_table">
+                                    <tr><td colspan="2" class="text-center p-4 text-gray-500">-</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profit Breakdown -->
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">💰 รายละเอียดกำไร</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="p-3 bg-green-50 rounded">
+                            <p class="text-xs text-gray-600">ยอดเงินสุทธิ</p>
+                            <p class="text-lg font-bold text-green-600">฿<span id="net_revenue">-</span></p>
+                        </div>
+                        <div class="p-3 bg-red-50 rounded">
+                            <p class="text-xs text-gray-600">ต้นทุนสินค้า</p>
+                            <p class="text-lg font-bold text-red-600">฿<span id="product_cost">-</span></p>
+                        </div>
+                        <div class="p-3 bg-red-50 rounded">
+                            <p class="text-xs text-gray-600">ค่าขนส่ง</p>
+                            <p class="text-lg font-bold text-red-600">฿<span id="shipping_cost">-</span></p>
+                        </div>
+                        <div class="p-3 bg-red-50 rounded">
+                            <p class="text-xs text-gray-600">ค่าจัดการ</p>
+                            <p class="text-lg font-bold text-red-600">฿<span id="operating_cost">-</span></p>
+                        </div>
+                        <div class="p-3 bg-red-50 rounded">
+                            <p class="text-xs text-gray-600">ค่าคนกลาง</p>
+                            <p class="text-lg font-bold text-red-600">฿<span id="commission">-</span></p>
+                        </div>
+                        <div class="p-3 bg-red-50 rounded">
+                            <p class="text-xs text-gray-600">ภาษี VAT</p>
+                            <p class="text-lg font-bold text-red-600">฿<span id="vat">-</span></p>
+                        </div>
+                        <div class="p-3 bg-blue-50 rounded col-span-1 md:col-span-2 lg:col-span-1">
+                            <p class="text-xs text-gray-600">กำไรสุทธิ</p>
+                            <p class="text-lg font-bold text-blue-600">฿<span id="net_profit">-</span></p>
+                        </div>
+                        <div class="p-3 bg-blue-50 rounded">
+                            <p class="text-xs text-gray-600">Profit Margin</p>
+                            <p class="text-lg font-bold text-blue-600"><span id="profit_margin">-</span>%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Customers & Coupons -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Top Customers -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-bold mb-4">⭐ ลูกค้า Top 5</h2>
+                        <div class="space-y-3" id="top_customers">
+                            <p class="text-gray-500">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Active Coupons -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-bold mb-4">🏷️ คูปองใช้ได้</h2>
+                        <div class="space-y-3" id="active_coupons">
+                            <p class="text-gray-500">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        function formatThaiNumber(num) {
+            if (!num) return '-';
+            return num.toLocaleString('th-TH');
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const data = result.data;
+
+                    // Update KPIs
+                    document.getElementById('total_revenue').textContent = 
+                        '฿' + formatThaiNumber((data.sales?.net_revenue_from_sales || 0).toFixed(0));
+                    document.getElementById('total_orders').textContent = 
+                        formatThaiNumber(data.orders?.total_orders || 0);
+                    document.getElementById('total_profit').textContent = 
+                        '฿' + formatThaiNumber((data.profit?.net_profit || 0).toFixed(0));
+                    document.getElementById('low_stock_count').textContent = 
+                        formatThaiNumber(data.low_stock_products?.length || 0);
+
+                    // Update Profit Breakdown
+                    document.getElementById('net_revenue').textContent = 
+                        formatThaiNumber((data.profit?.net_revenue || 0).toFixed(0));
+                    document.getElementById('product_cost').textContent = 
+                        formatThaiNumber((data.profit?.product_cost || 0).toFixed(0));
+                    document.getElementById('shipping_cost').textContent = 
+                        formatThaiNumber((data.profit?.shipping_cost || 0).toFixed(0));
+                    document.getElementById('operating_cost').textContent = 
+                        formatThaiNumber((data.profit?.operating_cost || 0).toFixed(0));
+                    document.getElementById('commission').textContent = 
+                        formatThaiNumber((data.profit?.commission || 0).toFixed(0));
+                    document.getElementById('vat').textContent = 
+                        formatThaiNumber((data.profit?.vat || 0).toFixed(0));
+                    document.getElementById('net_profit').textContent = 
+                        '฿' + formatThaiNumber((data.profit?.net_profit || 0).toFixed(0));
+                    document.getElementById('profit_margin').textContent = 
+                        (data.profit?.profit_margin_percent || 0).toFixed(2);
+
+                    // Low Stock Products
+                    const lowStockTable = document.getElementById('low_stock_table');
+                    if (data.low_stock_products?.length > 0) {
+                        lowStockTable.innerHTML = data.low_stock_products.map(p => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-2">${p.name}</td>
+                                <td class="text-center p-2"><span class="bg-red-100 text-red-800 px-2 py-1 rounded">${p.stock_quantity}</span></td>
+                            </tr>
+                        `).join('');
+                    }
+
+                    // Recent Orders
+                    const recentOrdersTable = document.getElementById('recent_orders_table');
+                    if (data.recent_orders?.length > 0) {
+                        recentOrdersTable.innerHTML = data.recent_orders.map(o => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-2">#${o.id}</td>
+                                <td class="text-right p-2">฿${(o.total_amount || 0).toLocaleString('th-TH')}</td>
+                            </tr>
+                        `).join('');
+                    }
+
+                    // Top Customers
+                    const topCustomers = document.getElementById('top_customers');
+                    if (data.top_customers?.length > 0) {
+                        topCustomers.innerHTML = data.top_customers.map((c, i) => `
+                            <div class="flex justify-between items-center p-3 bg-blue-50 rounded">
+                                <div>
+                                    <p class="font-semibold">${i + 1}. ${c.name}</p>
+                                    <p class="text-sm text-gray-600">${c.order_count} order</p>
+                                </div>
+                                <p class="text-lg font-bold text-blue-600">฿${(c.total_spent || 0).toLocaleString('th-TH')}</p>
+                            </div>
+                        `).join('');
+                    }
+
+                    // Active Coupons
+                    const activeCoupons = document.getElementById('active_coupons');
+                    try {
+                        const couponsRes = await fetch(`${API_BASE}/coupons`);
+                        const couponsData = await couponsRes.json();
+                        if (couponsData.success && couponsData.data?.length > 0) {
+                            activeCoupons.innerHTML = couponsData.data.slice(0, 5).map(c => `
+                                <div class="flex justify-between items-center p-3 bg-green-50 rounded">
+                                    <div>
+                                        <p class="font-semibold">${c.code}</p>
+                                        <p class="text-sm text-gray-600">${c.name}</p>
+                                    </div>
+                                    <p class="text-lg font-bold text-green-600">${c.discount_value}%</p>
+                                </div>
+                            `).join('');
+                        }
+                    } catch (e) {
+                        console.error('Coupon load error:', e);
+                    }
+
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="text-red-600">
+                        <p class="text-xl font-bold">❌ ข้อผิดพลาด</p>
+                        <p class="text-sm mt-2">${error.message}</p>
+                        <p class="text-xs text-gray-600 mt-2">ตรวจสอบว่า API Server กำลังทำงาน (http://localhost:5000)</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        loadDashboard();
+        setInterval(loadDashboard, 30000);
+    </script>
+</body>
+</html>
