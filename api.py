@@ -43,20 +43,25 @@ async def serve_dashboard():
 @app.get("/api/dashboard")
 async def get_dashboard():
     try:
-        # Fetch multiple detailed reports from Live API
-        summary = call_live_api("get_admin_dashboard_summary")
-        sales_over_time = call_live_api("get_admin_sales_over_time")
-        profit_report = call_live_api("get_admin_product_profit_report")
+        # Fetch the RICH data from Live API
+        data = call_live_api("admin_get_dashboard_data")
         
+        # Ensure we handle the response correctly (The rich API returns stats directly)
         return JSONResponse(content={
             "success": True,
             "data": {
-                "sales": summary,
-                "profit": summary, # Includes breakdown in your live API
-                "trends": sales_over_time.get("data", []),
-                "low_stock_products": summary.get("low_stock_products", []),
-                "top_products": profit_report.get("data", [])[:5] if isinstance(profit_report, dict) else [],
-                "stale_orders": summary.get("stale_orders_count", 0)
+                "sales": {
+                    "net_revenue": data.get("netRevenueFromSales", 0),
+                    "product_cost": data.get("expenseBreakdown", {}).get("product", 0),
+                    "vat": data.get("expenseBreakdown", {}).get("vat", 0),
+                    "net_profit": data.get("netProfit", 0),
+                    "profit_margin_percent": data.get("profitMarginPercent", 0),
+                    "total_orders": data.get("totalOrders", 0),
+                    "net_revenue_from_sales": data.get("netRevenueFromSales", 0)
+                },
+                "stale_orders": data.get("staleOrdersCount", 0),
+                "low_stock_products": data.get("lowStockProducts", []),
+                "recent_orders": data.get("recentOrders", []) # If available
             }
         })
     except Exception as e:
