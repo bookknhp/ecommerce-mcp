@@ -44,9 +44,11 @@ async def serve_dashboard():
 async def get_dashboard():
     try:
         # Fetch the RICH data from Live API
-        data = call_live_api("admin_get_dashboard_data")
+        raw_res = call_live_api("admin_get_dashboard_data")
         
-        # Ensure we handle the response correctly (The rich API returns stats directly)
+        # In your PHP framework, the data is often inside raw_res['data']
+        data = raw_res.get("data", raw_res) if isinstance(raw_res, dict) else {}
+        
         return JSONResponse(content={
             "success": True,
             "data": {
@@ -61,7 +63,7 @@ async def get_dashboard():
                 },
                 "stale_orders": data.get("staleOrdersCount", 0),
                 "low_stock_products": data.get("lowStockProducts", []),
-                "recent_orders": data.get("recentOrders", []) # If available
+                "recent_orders": data.get("recentOrders", [])
             }
         })
     except Exception as e:
