@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 @app.get("/", include_in_schema=False)
 async def serve_dashboard():
@@ -273,12 +273,12 @@ async def chat_with_ai(request: dict):
                 model="gpt-5-nano",
                 messages=messages
             )
-            return {"success": True, "reply": final_response.choices[0].message.content}
+            return JSONResponse(content={"success": True, "reply": final_response.choices[0].message.content})
         else:
-            return {"success": True, "reply": response_message.content}
+            return JSONResponse(content={"success": True, "reply": response_message.content})
             
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return JSONResponse(content={"success": False, "error": str(e)})
 
 # ===== HEALTH CHECK =====
 @app.get("/api/health")

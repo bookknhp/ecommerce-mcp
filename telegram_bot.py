@@ -91,7 +91,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"role": "user", "content": text}
         ]
         
-        # Call OpenAI with GPT-5 nano
+        # Call OpenAI with GPT-5 nano (2026 Model)
         response = client.chat.completions.create(
             model="gpt-5-nano", 
             messages=messages,
