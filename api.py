@@ -10,6 +10,7 @@ import json
 
 from openai import OpenAI
 from live_bridge import call_live_api
+from mcp_server import list_tools, execute_tool
 
 app = FastAPI(title="E-Commerce MCP API", version="1.0.0")
 
