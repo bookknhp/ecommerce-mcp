@@ -14,6 +14,13 @@ from database import Database
 from mcp_server import execute_tool, list_tools
 from openai import OpenAI
 
+# Setup logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
+
 # Configuration - Read from environment variables
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 ADMIN_CHAT_ID = int(os.environ.get('TELEGRAM_CHAT_ID', 5453025761))
@@ -21,20 +28,14 @@ API_BASE_URL = os.environ.get('API_BASE_URL', "http://localhost:5000/api")
 OPENAI_KEY = os.environ.get('OPENAI_API_KEY')
 
 # Initialize OpenAI
-if not OPENAI_KEY:
-    logger.error("Missing OPENAI_API_KEY environment variable!")
-else:
+client = None
+if OPENAI_KEY:
     client = OpenAI(api_key=OPENAI_KEY)
+else:
+    logger.error("Missing OPENAI_API_KEY environment variable!")
 
 # Initialize database
 db = Database()
-
-# Setup logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-logger = logging.getLogger(__name__)
 
 def format_thai_number(num):
     """Format number in Thai format"""
@@ -63,6 +64,10 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle text messages with ChatGPT AI Brain"""
     text = update.message.text.strip()
     
+    if not client:
+        await update.message.reply_text("❌ AI ยังไม่พร้อมใช้งาน (กรุณาตั้งค่า OPENAI_API_KEY ใน Railway)")
+        return
+
     # Let OpenAI process the request
     try:
         # Inform user AI is thinking
