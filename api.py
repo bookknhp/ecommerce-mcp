@@ -19,6 +19,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.responses import FileResponse
+
+@app.get("/", include_in_schema=False)
+async def serve_dashboard():
+    return FileResponse("dashboard.html")
+
 # Database
 db = Database()
 
