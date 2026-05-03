@@ -3,10 +3,10 @@
 .env.local
 .env.*.local
 
-# Database
-*.sqlite
-*.db
-*.sqlite3
+# Database (Allowed for Railway deployment)
+# *.sqlite
+# *.db
+# *.sqlite3
 
 # Python
 __pycache__/
