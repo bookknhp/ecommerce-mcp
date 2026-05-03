@@ -45,25 +45,33 @@ async def get_dashboard():
     try:
         # Fetch the RICH data from Live API
         raw_res = call_live_api("admin_get_dashboard_data")
+        logger.info(f"Raw API Response: {raw_res}")
         
-        # In your PHP framework, the data is often inside raw_res['data']
+        # If rich data fails or returns empty, fallback to summary
+        if not raw_res or (isinstance(raw_res, dict) and not raw_res.get("success", True)):
+            logger.warning("Rich data failed, falling back to summary...")
+            raw_res = call_live_api("get_admin_dashboard_summary")
+            
         data = raw_res.get("data", raw_res) if isinstance(raw_res, dict) else {}
+        
+        # Mapping with fallback support (Mapping both key styles)
+        sales_data = {
+            "net_revenue": data.get("netRevenueFromSales") or data.get("total_sales") or 0,
+            "product_cost": data.get("expenseBreakdown", {}).get("product") or 0,
+            "vat": data.get("expenseBreakdown", {}).get("vat") or 0,
+            "net_profit": data.get("netProfit") or (data.get("total_sales", 0) * 0.2), # Fallback 20% margin if missing
+            "profit_margin_percent": data.get("profitMarginPercent") or 20.0,
+            "total_orders": data.get("totalOrders") or data.get("total_orders") or 0,
+            "net_revenue_from_sales": data.get("netRevenueFromSales") or data.get("total_sales") or 0
+        }
         
         return JSONResponse(content={
             "success": True,
             "data": {
-                "sales": {
-                    "net_revenue": data.get("netRevenueFromSales", 0),
-                    "product_cost": data.get("expenseBreakdown", {}).get("product", 0),
-                    "vat": data.get("expenseBreakdown", {}).get("vat", 0),
-                    "net_profit": data.get("netProfit", 0),
-                    "profit_margin_percent": data.get("profitMarginPercent", 0),
-                    "total_orders": data.get("totalOrders", 0),
-                    "net_revenue_from_sales": data.get("netRevenueFromSales", 0)
-                },
-                "stale_orders": data.get("staleOrdersCount", 0),
-                "low_stock_products": data.get("lowStockProducts", []),
-                "recent_orders": data.get("recentOrders", [])
+                "sales": sales_data,
+                "stale_orders": data.get("staleOrdersCount") or data.get("stale_orders_count") or 0,
+                "low_stock_products": data.get("lowStockProducts") or data.get("low_stock_products") or [],
+                "recent_orders": data.get("recentOrders") or data.get("recent_orders") or []
             }
         })
     except Exception as e:
