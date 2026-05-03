@@ -43,8 +43,22 @@ async def serve_dashboard():
 @app.get("/api/dashboard")
 async def get_dashboard():
     try:
+        # Fetch multiple detailed reports from Live API
         summary = call_live_api("get_admin_dashboard_summary")
-        return JSONResponse(content={"success": True, "data": summary})
+        sales_over_time = call_live_api("get_admin_sales_over_time")
+        profit_report = call_live_api("get_admin_product_profit_report")
+        
+        return JSONResponse(content={
+            "success": True,
+            "data": {
+                "sales": summary,
+                "profit": summary, # Includes breakdown in your live API
+                "trends": sales_over_time.get("data", []),
+                "low_stock_products": summary.get("low_stock_products", []),
+                "top_products": profit_report.get("data", [])[:5] if isinstance(profit_report, dict) else [],
+                "stale_orders": summary.get("stale_orders_count", 0)
+            }
+        })
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 

@@ -210,24 +210,33 @@
             <div class="space-y-8">
                 <!-- Profit Breakdown -->
                 <div class="glass-card p-6">
-                    <h2 class="text-lg font-semibold mb-6">💰 Financial Stats</h2>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 text-sm">Net Revenue</span>
-                            <span class="font-bold">฿<span id="net_revenue">0</span></span>
+                    <h2 class="text-lg font-semibold">💰 Financial Stats</h2>
+                    <!-- Finance Details -->
+                    <div class="mt-8 space-y-4">
+                        <div class="flex justify-between items-center text-sm p-3 bg-white/5 rounded-xl">
+                            <span class="text-slate-400">ออเดอร์ค้างส่ง (>24ชม)</span>
+                            <span class="font-bold text-rose-400" id="stale_orders">0</span>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 text-sm">Product Cost</span>
-                            <span class="text-rose-400 font-bold">- ฿<span id="product_cost">0</span></span>
+                        <div class="flex justify-between items-center text-sm p-3 bg-white/5 rounded-xl border border-white/5">
+                            <span class="text-slate-400">รายได้สุทธิ</span>
+                            <span class="font-bold" id="net_revenue">฿0</span>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 text-sm">Tax (VAT 7%)</span>
-                            <span class="text-slate-500 font-bold">฿<span id="vat">0</span></span>
+                        <div class="flex justify-between items-center text-sm p-3 bg-white/5 rounded-xl">
+                            <span class="text-slate-400">ต้นทุนสินค้า</span>
+                            <span class="font-bold" id="product_cost">฿0</span>
                         </div>
-                        <div class="h-px bg-white/10 my-2"></div>
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold">Profit Margin</span>
-                            <span class="text-emerald-400 font-bold"><span id="profit_margin">0</span>%</span>
+                        <div class="flex justify-between items-center text-sm p-3 bg-white/5 rounded-xl">
+                            <span class="text-slate-400">ภาษี (VAT 7%)</span>
+                            <span class="font-bold" id="vat">฿0</span>
+                        </div>
+                        <div class="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Profit Margin</span>
+                                <span class="text-xl font-black text-indigo-400"><span id="profit_margin">0</span>%</span>
+                            </div>
+                            <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                                <div class="bg-indigo-500 h-full" id="margin_bar" style="width: 0%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -305,19 +314,23 @@
 
                     // Update Main KPIs
                     document.getElementById('total_revenue').textContent = '฿' + formatThaiNumber(Math.round(data.sales?.net_revenue_from_sales || 0));
-                    document.getElementById('total_orders').textContent = formatThaiNumber(data.orders?.total_orders || 0);
-                    document.getElementById('total_profit').textContent = '฿' + formatThaiNumber(Math.round(data.profit?.net_profit || 0));
+                    document.getElementById('total_orders').textContent = formatThaiNumber(data.sales?.total_orders || 0);
+                    document.getElementById('total_profit').textContent = '฿' + formatThaiNumber(Math.round(data.sales?.net_profit || 0));
                     document.getElementById('low_stock_count').textContent = formatThaiNumber(data.low_stock_products?.length || 0);
 
-                    // Update Finance Sidebar
-                    document.getElementById('net_revenue').textContent = formatThaiNumber(Math.round(data.profit?.net_revenue || 0));
-                    document.getElementById('product_cost').textContent = formatThaiNumber(Math.round(data.profit?.product_cost || 0));
-                    document.getElementById('vat').textContent = formatThaiNumber(Math.round(data.profit?.vat || 0));
-                    document.getElementById('profit_margin').textContent = (data.profit?.profit_margin_percent || 0).toFixed(1);
+                    // Update Detailed Stats
+                    document.getElementById('stale_orders').textContent = formatThaiNumber(data.stale_orders || 0);
+                    document.getElementById('net_revenue').textContent = '฿' + formatThaiNumber(Math.round(data.sales?.net_revenue || 0));
+                    document.getElementById('product_cost').textContent = '฿' + formatThaiNumber(Math.round(data.sales?.product_cost || 0));
+                    document.getElementById('vat').textContent = '฿' + formatThaiNumber(Math.round(data.sales?.vat || 0));
+                    
+                    const margin = data.sales?.profit_margin_percent || 0;
+                    document.getElementById('profit_margin').textContent = margin.toFixed(1);
+                    document.getElementById('margin_bar').style.width = margin + '%';
 
-                    // Inject Orders
+                    // Inject Recent Orders
                     const orderTable = document.getElementById('recent_orders_table');
-                    orderTable.innerHTML = (data.recent_orders || []).slice(0, 5).map(o => `
+                    orderTable.innerHTML = (data.sales?.recent_orders || []).slice(0, 5).map(o => `
                         <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
                             <td class="px-6 py-4 font-mono text-indigo-400">#${o.id}</td>
                             <td class="px-6 py-4 text-slate-300">Customer</td>
