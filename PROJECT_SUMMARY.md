@@ -38,7 +38,7 @@
 
 ### All-in-One:
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 ./start_all.sh
 ```
 

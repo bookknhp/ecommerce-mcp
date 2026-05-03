@@ -4,14 +4,14 @@
 
 ### Step 1: รัน Flask Server
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 python3 app.py
 # ✅ http://localhost:5000
 ```
 
 ### Step 2: เข้า Dashboard (Terminal ใหม่)
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 python3 -m http.server 8000
 # 📊 http://localhost:8000/dashboard.html
 ```
@@ -24,7 +24,7 @@ python3 -m http.server 8000
   "mcpServers": {
     "ecommerce": {
       "command": "python3",
-      "args": ["/Users/bookk/Documents/ecommerce-mcp/mcp_server.py"]
+      "args": ["/Users/bookntp/Desktop/ecommerce-mcp/mcp_server.py"]
     }
   }
 }

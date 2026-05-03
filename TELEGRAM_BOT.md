@@ -10,7 +10,7 @@
 
 - ✅ **Bot Token:** `8553217591:AAHKOQ0r1Lp4hqfDVkhiFIrioz1Py8V8XSs`
 - ✅ **Chat ID:** `5453025761`
-- ✅ **Bot Script:** `/Users/bookk/Documents/ecommerce-mcp/telegram_bot.py`
+- ✅ **Bot Script:** `/Users/bookntp/Desktop/ecommerce-mcp/telegram_bot.py`
 
 ---
 
@@ -18,14 +18,14 @@
 
 ### Terminal 1: รัน Flask Server
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 python3 app.py
 # ✅ http://localhost:5000
 ```
 
 ### Terminal 2: รัน Telegram Bot
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 python3 telegram_bot.py
 ```
 

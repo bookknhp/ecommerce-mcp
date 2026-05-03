@@ -22,17 +22,16 @@ echo -e "${GREEN}✅ Python3 found${NC}"
 echo ""
 
 # Create logs directory
-mkdir -p /Users/bookk/Documents/ecommerce-mcp/logs
+mkdir -p logs
 
 echo "📋 Services to start:"
-echo "  1. Flask API Server (Port 5000)"
+echo "  1. Flask API Server (Port 5001)"
 echo "  2. HTTP Dashboard Server (Port 8000)"
 echo "  3. Telegram Bot"
 echo ""
 
 # Start Flask
 echo -e "${YELLOW}▶ Starting Flask API Server...${NC}"
-cd /Users/bookk/Documents/ecommerce-mcp
 python3 app.py > logs/flask.log 2>&1 &
 FLASK_PID=$!
 echo -e "${GREEN}✅ Flask started (PID: $FLASK_PID)${NC}"
@@ -60,7 +59,7 @@ echo ""
 
 echo "📍 URLs:"
 echo "  🌐 Dashboard:   http://localhost:8000/dashboard.html"
-echo "  📡 API Base:    http://localhost:5000/api"
+echo "  📡 API Base:    http://localhost:5001/api"
 echo "  💬 Telegram:    Search @ecommerce_mcp_bot (or your bot name)"
 echo ""
 

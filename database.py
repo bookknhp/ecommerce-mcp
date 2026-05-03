@@ -508,7 +508,8 @@ class Database:
             from datetime import datetime
             
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            backup_path = f"/Users/bookk/Documents/FULL_BACKUP_20260503_0050/data/backups/shop_main_backup_{timestamp}.sqlite"
+            backup_path = f"backups/shop_main_backup_{timestamp}.sqlite"
+            os.makedirs("backups", exist_ok=True)
             
             shutil.copy2(str(self.db_path), backup_path)
             return {'success': True, 'backup_path': backup_path, 'message': f'Database backed up to {backup_path}'}

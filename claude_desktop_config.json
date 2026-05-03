@@ -2,7 +2,7 @@
   "mcpServers": {
     "ecommerce": {
       "command": "python3",
-      "args": ["/Users/bookk/Documents/ecommerce-mcp/mcp_server.py"],
+      "args": ["/Users/bookntp/Desktop/ecommerce-mcp/mcp_server.py"],
       "disabled": false
     }
   }

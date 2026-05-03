@@ -25,7 +25,7 @@
 
 #### 1. รัน Flask Server (Dashboard + REST API):
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 python3 app.py
 # เปิด http://localhost:5000
 ```
@@ -64,7 +64,7 @@ python3 -m http.server 8000
      "mcpServers": {
        "ecommerce": {
          "command": "python3",
-         "args": ["/Users/bookk/Documents/ecommerce-mcp/mcp_server.py"]
+         "args": ["/Users/bookntp/Desktop/ecommerce-mcp/mcp_server.py"]
        }
      }
    }
@@ -245,7 +245,7 @@ ecommerce-mcp/
 
 ### **Step 1: รัน Flask Server**
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 python3 app.py
 
 # Output:
@@ -255,7 +255,7 @@ python3 app.py
 
 ### **Step 2: เข้า Dashboard (ในเทอร์มินอล/TTY ใหม่)**
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 python3 -m http.server 8000
 
 # แล้วเปิด: http://localhost:8000/dashboard.html

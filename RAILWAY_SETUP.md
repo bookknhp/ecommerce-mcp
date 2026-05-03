@@ -12,7 +12,7 @@
 ### ⚠️ ขั้นแรก: เตรียม GitHub Repo
 
 ```bash
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 
 # สร้าง Git repo
 git init
@@ -54,7 +54,7 @@ brew install railway
 railway login
 
 # เชื่อมต่อกับ GitHub repo
-cd /Users/bookk/Documents/ecommerce-mcp
+cd /Users/bookntp/Desktop/ecommerce-mcp
 railway connect
 
 # Deploy

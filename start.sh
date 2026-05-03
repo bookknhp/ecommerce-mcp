@@ -18,7 +18,7 @@ if lsof -i :5000 > /dev/null 2>&1; then
     echo "✅ Flask Server already running on :5000"
 else
     echo "🚀 Starting Flask Server..."
-    cd /Users/bookk/Documents/ecommerce-mcp
+    cd /Users/bookntp/Desktop/ecommerce-mcp
     python3 app.py &
     sleep 2
     echo "✅ Flask Server started"
@@ -32,8 +32,8 @@ echo "  📊 Home: http://localhost:5000"
 echo ""
 
 echo "🤖 MCP Server (for Claude Desktop):"
-echo "  📝 Config file: /Users/bookk/Documents/ecommerce-mcp/claude_desktop_config.json"
-echo "  💻 Server script: /Users/bookk/Documents/ecommerce-mcp/mcp_server.py"
+echo "  📝 Config file: /Users/bookntp/Desktop/ecommerce-mcp/claude_desktop_config.json"
+echo "  💻 Server script: /Users/bookntp/Desktop/ecommerce-mcp/mcp_server.py"
 echo ""
 
 echo "🔧 Available Tools:"
