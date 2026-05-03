@@ -208,36 +208,11 @@ def cleanup_database():
     return jsonify(result)
 
 # ===== HOME =====
+from flask import send_file
+
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify({
-        'service': 'E-Commerce MCP Dashboard API',
-        'version': '1.0.0',
-        'endpoints': {
-            'Dashboard': '/api/dashboard',
-            'Products': {
-                'list': '/api/products',
-                'low_stock': '/api/products/low-stock',
-                'stats': '/api/products/stats'
-            },
-            'Orders': {
-                'list': '/api/orders',
-                'stats': '/api/orders/stats'
-            },
-            'Coupons': {
-                'list': '/api/coupons',
-                'usage': '/api/coupons/usage'
-            },
-            'Sales': {
-                'analytics': '/api/sales/analytics',
-                'profit': '/api/sales/profit'
-            },
-            'Users': {
-                'list': '/api/users',
-                'top_customers': '/api/users/top'
-            }
-        }
-    })
+    return send_file('dashboard.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
