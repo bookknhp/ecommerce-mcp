@@ -8,7 +8,16 @@ from database import Database
 import os
 import json
 
+from openai import OpenAI
+from live_bridge import call_live_api
+
 app = FastAPI(title="E-Commerce MCP API", version="1.0.0")
+
+# OpenAI Configuration
+OPENAI_KEY = os.environ.get('OPENAI_API_KEY')
+client = None
+if OPENAI_KEY:
+    client = OpenAI(api_key=OPENAI_KEY)
 
 # CORS
 app.add_middleware(
@@ -121,23 +130,35 @@ def get_top_customers():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ===== DASHBOARD =====
+# ===== DASHBOARD API =====
 @app.get("/api/dashboard")
-def get_dashboard():
+async def get_dashboard():
+    """Get summarized dashboard data from LIVE API"""
     try:
-        dashboard = {
-            "products": db.get_product_stats(),
-            "orders": db.get_order_stats(),
-            "sales": db.get_sales_analytics(),
-            "profit": db.get_profit_analysis(),
-            "low_stock": db.get_low_stock_products(threshold=5),
-            "top_customers": db.get_top_customers(),
-            "recent_orders": db.get_orders(limit=10),
-            "coupons": db.get_coupons(active_only=True),
+        summary = call_live_api("get_admin_dashboard_summary")
+        sales = call_live_api("get_admin_sales_over_time")
+        products = call_live_api("get_products", {"stock_lt": 10})
+        
+        return {
+            "success": True,
+            "data": {
+                "sales": summary,
+                "orders": {"total_orders": summary.get("total_orders", 0)},
+                "profit": summary, # Live summary includes net_profit
+                "low_stock_products": products.get("data", []) if isinstance(products, dict) else [],
+                "recent_orders": [] # Can fetch if needed
+            }
         }
-        return {"success": True, "data": dashboard}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/products")
+async def get_products():
+    return call_live_api("get_products")
+
+@app.get("/api/coupons")
+async def get_coupons():
+    return call_live_api("get_publicly_available_coupons")
 
 # ===== WRITE OPERATIONS =====
 @app.put("/api/products/{product_id}/price")
@@ -196,6 +217,67 @@ def disable_coupon(coupon_id: int):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ===== AI CHAT =====
+@app.post("/api/chat")
+async def chat_with_ai(request: dict):
+    if not client:
+        return {"success": False, "error": "OpenAI API Key not configured"}
+    
+    user_message = request.get("message")
+    if not user_message:
+        return {"success": False, "error": "No message provided"}
+    
+    try:
+        mcp_tools = list_tools()
+        openai_tools = []
+        for t in mcp_tools:
+            openai_tools.append({
+                "type": "function",
+                "function": {
+                    "name": t["name"],
+                    "description": t["description"],
+                    "parameters": t["inputSchema"]
+                }
+            })
+        
+        messages = [
+            {"role": "system", "content": "You are a helpful E-Commerce Manager AI powered by GPT-5 nano. Use the provided tools to manage the shop. ALWAYS respond in Thai."},
+            {"role": "user", "content": user_message}
+        ]
+        
+        response = client.chat.completions.create(
+            model="gpt-5-nano",
+            messages=messages,
+            tools=openai_tools,
+            tool_choice="auto"
+        )
+        
+        response_message = response.choices[0].message
+        
+        if response_message.tool_calls:
+            messages.append(response_message)
+            for tool_call in response_message.tool_calls:
+                function_name = tool_call.function.name
+                function_args = json.loads(tool_call.function.arguments)
+                result = execute_tool(function_name, function_args)
+                messages.append({
+                    "tool_call_id": tool_call.id,
+                    "role": "tool",
+                    "name": function_name,
+                    "content": json.dumps(result, ensure_ascii=False)
+                })
+            
+            final_response = client.chat.completions.create(
+                model="gpt-5-nano",
+                messages=messages
+            )
+            return {"success": True, "reply": final_response.choices[0].message.content}
+        else:
+            return {"success": True, "reply": response_message.content}
+            
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 # ===== HEALTH CHECK =====
 @app.get("/api/health")
