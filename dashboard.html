@@ -3,182 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce MCP Dashboard</title>
+    <title>E-Commerce AI Dashboard | FRIDAY AI PRO MANAGER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modern Gradient Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(192, 38, 211, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(147, 51, 234, 0.15) 0px, transparent 50%);
+        }
+
+        /* Animated Chat Widget */
+        #chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        #chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .ai-bubble {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 4px;
+        }
+        .user-bubble {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Status Indicator */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- Header -->
-        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 py-6">
-                <h1 class="text-3xl font-bold">📊 E-Commerce Dashboard</h1>
-                <p class="text-blue-100 mt-2">AI-Powered Analytics & Insights</p>
+<body>
+    <div class="bg-mesh"></div>
+
+    <!-- Navigation -->
+    <nav class="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center font-bold text-xl">E</div>
+            <h1 class="text-xl font-bold tracking-tight">AI Shop Manager</h1>
+        </div>
+        <div class="flex gap-4">
+            <div class="nav-btn flex items-center gap-2">
+                <span class="status-dot"></span>
+                <span class="text-sm font-medium text-slate-300">System Live</span>
             </div>
-        </header>
+        </div>
+    </nav>
 
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 py-8">
-            <!-- Loading State -->
-            <div id="loading" class="text-center py-8">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <p class="text-gray-600 mt-2">กำลังโหลดข้อมูล...</p>
+    <main class="max-w-7xl mx-auto px-6 py-4">
+        <!-- KPI Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <!-- Total Sales -->
+            <div class="glass-card p-6">
+                <p class="text-slate-400 text-sm font-medium mb-1">Total Sales</p>
+                <h3 class="text-3xl font-bold" id="total_revenue">฿0</h3>
+                <div class="mt-4 flex items-center text-emerald-400 text-xs font-bold">
+                    <span>+12.5% from last month</span>
+                </div>
             </div>
+            <!-- Orders -->
+            <div class="glass-card p-6">
+                <p class="text-slate-400 text-sm font-medium mb-1">Total Orders</p>
+                <h3 class="text-3xl font-bold" id="total_orders">0</h3>
+                <div class="mt-4 text-slate-500 text-xs font-bold">Processed Orders</div>
+            </div>
+            <!-- Net Profit -->
+            <div class="glass-card p-6 border-l-4 border-l-purple-500">
+                <p class="text-slate-400 text-sm font-medium mb-1">Net Profit</p>
+                <h3 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400" id="total_profit">฿0</h3>
+                <div class="mt-4 text-slate-500 text-xs font-bold">After Expenses</div>
+            </div>
+            <!-- Alerts -->
+            <div class="glass-card p-6">
+                <p class="text-slate-400 text-sm font-medium mb-1">Stock Alerts</p>
+                <h3 class="text-3xl font-bold text-rose-400" id="low_stock_count">0</h3>
+                <div class="mt-4 text-slate-500 text-xs font-bold">Requires Attention</div>
+            </div>
+        </div>
 
-            <!-- Dashboard Grid -->
-            <div id="dashboard" style="display: none;">
-                <!-- KPI Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Total Revenue -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">ยอดรวมทั้งหมด</p>
-                                <p class="text-2xl font-bold text-blue-600" id="total_revenue">-</p>
-                            </div>
-                            <div class="text-4xl text-blue-200">💰</div>
-                        </div>
+        <!-- Data Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+            <!-- Main Content Area -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Recent Activity Table -->
+                <div class="glass-card overflow-hidden">
+                    <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                        <h2 class="text-lg font-semibold">📋 Recent Orders</h2>
+                        <button class="text-xs text-indigo-400 hover:text-indigo-300 font-bold">VIEW ALL</button>
                     </div>
-
-                    <!-- Total Orders -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">คำสั่งซื้อทั้งหมด</p>
-                                <p class="text-2xl font-bold text-green-600" id="total_orders">-</p>
-                            </div>
-                            <div class="text-4xl text-green-200">📦</div>
-                        </div>
-                    </div>
-
-                    <!-- Profit -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">กำไรสุทธิ</p>
-                                <p class="text-2xl font-bold text-purple-600" id="total_profit">-</p>
-                            </div>
-                            <div class="text-4xl text-purple-200">📈</div>
-                        </div>
-                    </div>
-
-                    <!-- Low Stock Alert -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">⚠️ Stock ต่ำ</p>
-                                <p class="text-2xl font-bold text-red-600" id="low_stock_count">-</p>
-                            </div>
-                            <div class="text-4xl text-red-200">🚨</div>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="text-slate-500 text-xs font-bold bg-white/5">
+                                <tr>
+                                    <th class="px-6 py-4">ORDER ID</th>
+                                    <th class="px-6 py-4">CUSTOMER</th>
+                                    <th class="px-6 py-4 text-right">TOTAL</th>
+                                    <th class="px-6 py-4 text-center">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent_orders_table" class="text-sm">
+                                <!-- Data will be injected here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Low Stock Products -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    <!-- Low Stock Table -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-bold mb-4">🚨 สินค้า Stock ต่ำ</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead class="bg-gray-100 border-b">
-                                    <tr>
-                                        <th class="text-left p-2">สินค้า</th>
-                                        <th class="text-center p-2">Stock</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="low_stock_table">
-                                    <tr><td colspan="2" class="text-center p-4 text-gray-500">-</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <!-- Stock Table -->
+                <div class="glass-card overflow-hidden">
+                    <div class="p-6 border-b border-white/5">
+                        <h2 class="text-lg font-semibold">🚨 Low Stock Products</h2>
                     </div>
-
-                    <!-- Recent Orders -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-bold mb-4">📋 คำสั่งซื้อล่าสุด</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead class="bg-gray-100 border-b">
-                                    <tr>
-                                        <th class="text-left p-2">Order ID</th>
-                                        <th class="text-right p-2">ยอดเงิน</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recent_orders_table">
-                                    <tr><td colspan="2" class="text-center p-4 text-gray-500">-</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-slate-500 text-xs font-bold bg-white/5">
+                                <tr>
+                                    <th class="px-6 py-4">PRODUCT NAME</th>
+                                    <th class="px-6 py-4 text-center">CURRENT STOCK</th>
+                                    <th class="px-6 py-4 text-right">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="low_stock_table">
+                                <!-- Data will be injected here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
+            <!-- Sidebar Info -->
+            <div class="space-y-8">
                 <!-- Profit Breakdown -->
-                <div class="bg-white rounded-lg shadow p-6 mb-8">
-                    <h2 class="text-xl font-bold mb-4">💰 รายละเอียดกำไร</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="p-3 bg-green-50 rounded">
-                            <p class="text-xs text-gray-600">ยอดเงินสุทธิ</p>
-                            <p class="text-lg font-bold text-green-600">฿<span id="net_revenue">-</span></p>
+                <div class="glass-card p-6">
+                    <h2 class="text-lg font-semibold mb-6">💰 Financial Stats</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 text-sm">Net Revenue</span>
+                            <span class="font-bold">฿<span id="net_revenue">0</span></span>
                         </div>
-                        <div class="p-3 bg-red-50 rounded">
-                            <p class="text-xs text-gray-600">ต้นทุนสินค้า</p>
-                            <p class="text-lg font-bold text-red-600">฿<span id="product_cost">-</span></p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 text-sm">Product Cost</span>
+                            <span class="text-rose-400 font-bold">- ฿<span id="product_cost">0</span></span>
                         </div>
-                        <div class="p-3 bg-red-50 rounded">
-                            <p class="text-xs text-gray-600">ค่าขนส่ง</p>
-                            <p class="text-lg font-bold text-red-600">฿<span id="shipping_cost">-</span></p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 text-sm">Tax (VAT 7%)</span>
+                            <span class="text-slate-500 font-bold">฿<span id="vat">0</span></span>
                         </div>
-                        <div class="p-3 bg-red-50 rounded">
-                            <p class="text-xs text-gray-600">ค่าจัดการ</p>
-                            <p class="text-lg font-bold text-red-600">฿<span id="operating_cost">-</span></p>
-                        </div>
-                        <div class="p-3 bg-red-50 rounded">
-                            <p class="text-xs text-gray-600">ค่าคนกลาง</p>
-                            <p class="text-lg font-bold text-red-600">฿<span id="commission">-</span></p>
-                        </div>
-                        <div class="p-3 bg-red-50 rounded">
-                            <p class="text-xs text-gray-600">ภาษี VAT</p>
-                            <p class="text-lg font-bold text-red-600">฿<span id="vat">-</span></p>
-                        </div>
-                        <div class="p-3 bg-blue-50 rounded col-span-1 md:col-span-2 lg:col-span-1">
-                            <p class="text-xs text-gray-600">กำไรสุทธิ</p>
-                            <p class="text-lg font-bold text-blue-600">฿<span id="net_profit">-</span></p>
-                        </div>
-                        <div class="p-3 bg-blue-50 rounded">
-                            <p class="text-xs text-gray-600">Profit Margin</p>
-                            <p class="text-lg font-bold text-blue-600"><span id="profit_margin">-</span>%</p>
+                        <div class="h-px bg-white/10 my-2"></div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">Profit Margin</span>
+                            <span class="text-emerald-400 font-bold"><span id="profit_margin">0</span>%</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Top Customers & Coupons -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Top Customers -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-bold mb-4">⭐ ลูกค้า Top 5</h2>
-                        <div class="space-y-3" id="top_customers">
-                            <p class="text-gray-500">-</p>
-                        </div>
-                    </div>
-
-                    <!-- Active Coupons -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-bold mb-4">🏷️ คูปองใช้ได้</h2>
-                        <div class="space-y-3" id="active_coupons">
-                            <p class="text-gray-500">-</p>
-                        </div>
+                <!-- Top Customers -->
+                <div class="glass-card p-6">
+                    <h2 class="text-lg font-semibold mb-6">⭐ VIP Customers</h2>
+                    <div id="top_customers" class="space-y-4">
+                        <!-- Data will be injected -->
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+    </main>
+
+    <!-- Floating Chat Widget -->
+    <div id="chat-widget">
+        <div class="p-5 bg-gradient-to-r from-indigo-600 to-purple-600 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl">🤖</div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm">GPT-5 Nano</h4>
+                    <p class="text-[10px] text-white/70">Online | AI Assistant</p>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+        </div>
+        
+        <div id="chat-messages" class="flex-1 p-5 space-y-4">
+            <div class="ai-bubble message p-4 text-sm text-slate-200">
+                สวัสดีครับคุณบุ๊ค! ผมเป็นผู้ช่วย AI ส่วนตัวของคุณครับ วันนี้ให้ผมช่วยทำอะไรกับร้านค้าดีครับ? ✨
+            </div>
+        </div>
+
+        <div class="p-5 bg-white/5 border-t border-white/5">
+            <div class="flex gap-2 bg-slate-800/50 p-2 rounded-2xl border border-white/10">
+                <input type="text" id="chat-input" 
+                    class="bg-transparent border-none flex-1 px-3 py-2 text-sm outline-none placeholder:text-slate-500" 
+                    placeholder="พิมพ์คำสั่ง เช่น 'เช็คยอดวันนี้'..." 
+                    onkeypress="if(event.key === 'Enter') sendAIChat()">
+                <button onclick="sendAIChat()" class="bg-indigo-500 hover:bg-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center transition-all">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
         const API_BASE = '/api';
+        let isChatMinimized = false;
+
+        function toggleChat() {
+            const widget = document.getElementById('chat-widget');
+            isChatMinimized = !isChatMinimized;
+            widget.style.height = isChatMinimized ? '80px' : '550px';
+        }
 
         function formatThaiNumber(num) {
-            if (!num) return '-';
+            if (num === undefined || num === null) return '0';
             return num.toLocaleString('th-TH');
         }
 
@@ -190,106 +303,107 @@
                 if (result.success) {
                     const data = result.data;
 
-                    // Update KPIs
-                    document.getElementById('total_revenue').textContent = 
-                        '฿' + formatThaiNumber((data.sales?.net_revenue_from_sales || 0).toFixed(0));
-                    document.getElementById('total_orders').textContent = 
-                        formatThaiNumber(data.orders?.total_orders || 0);
-                    document.getElementById('total_profit').textContent = 
-                        '฿' + formatThaiNumber((data.profit?.net_profit || 0).toFixed(0));
-                    document.getElementById('low_stock_count').textContent = 
-                        formatThaiNumber(data.low_stock_products?.length || 0);
+                    // Update Main KPIs
+                    document.getElementById('total_revenue').textContent = '฿' + formatThaiNumber(Math.round(data.sales?.net_revenue_from_sales || 0));
+                    document.getElementById('total_orders').textContent = formatThaiNumber(data.orders?.total_orders || 0);
+                    document.getElementById('total_profit').textContent = '฿' + formatThaiNumber(Math.round(data.profit?.net_profit || 0));
+                    document.getElementById('low_stock_count').textContent = formatThaiNumber(data.low_stock_products?.length || 0);
 
-                    // Update Profit Breakdown
-                    document.getElementById('net_revenue').textContent = 
-                        formatThaiNumber((data.profit?.net_revenue || 0).toFixed(0));
-                    document.getElementById('product_cost').textContent = 
-                        formatThaiNumber((data.profit?.product_cost || 0).toFixed(0));
-                    document.getElementById('shipping_cost').textContent = 
-                        formatThaiNumber((data.profit?.shipping_cost || 0).toFixed(0));
-                    document.getElementById('operating_cost').textContent = 
-                        formatThaiNumber((data.profit?.operating_cost || 0).toFixed(0));
-                    document.getElementById('commission').textContent = 
-                        formatThaiNumber((data.profit?.commission || 0).toFixed(0));
-                    document.getElementById('vat').textContent = 
-                        formatThaiNumber((data.profit?.vat || 0).toFixed(0));
-                    document.getElementById('net_profit').textContent = 
-                        '฿' + formatThaiNumber((data.profit?.net_profit || 0).toFixed(0));
-                    document.getElementById('profit_margin').textContent = 
-                        (data.profit?.profit_margin_percent || 0).toFixed(2);
+                    // Update Finance Sidebar
+                    document.getElementById('net_revenue').textContent = formatThaiNumber(Math.round(data.profit?.net_revenue || 0));
+                    document.getElementById('product_cost').textContent = formatThaiNumber(Math.round(data.profit?.product_cost || 0));
+                    document.getElementById('vat').textContent = formatThaiNumber(Math.round(data.profit?.vat || 0));
+                    document.getElementById('profit_margin').textContent = (data.profit?.profit_margin_percent || 0).toFixed(1);
 
-                    // Low Stock Products
-                    const lowStockTable = document.getElementById('low_stock_table');
-                    if (data.low_stock_products?.length > 0) {
-                        lowStockTable.innerHTML = data.low_stock_products.map(p => `
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-2">${p.name}</td>
-                                <td class="text-center p-2"><span class="bg-red-100 text-red-800 px-2 py-1 rounded">${p.stock_quantity}</span></td>
-                            </tr>
-                        `).join('');
-                    }
+                    // Inject Orders
+                    const orderTable = document.getElementById('recent_orders_table');
+                    orderTable.innerHTML = (data.recent_orders || []).slice(0, 5).map(o => `
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 font-mono text-indigo-400">#${o.id}</td>
+                            <td class="px-6 py-4 text-slate-300">Customer</td>
+                            <td class="px-6 py-4 text-right font-bold">฿${formatThaiNumber(o.total_amount)}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] rounded-full font-bold">COMPLETED</span>
+                            </td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="4" class="p-10 text-center text-slate-500">No recent orders</td></tr>';
 
-                    // Recent Orders
-                    const recentOrdersTable = document.getElementById('recent_orders_table');
-                    if (data.recent_orders?.length > 0) {
-                        recentOrdersTable.innerHTML = data.recent_orders.map(o => `
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-2">#${o.id}</td>
-                                <td class="text-right p-2">฿${(o.total_amount || 0).toLocaleString('th-TH')}</td>
-                            </tr>
-                        `).join('');
-                    }
+                    // Inject Stock Alerts
+                    const stockTable = document.getElementById('low_stock_table');
+                    stockTable.innerHTML = (data.low_stock_products || []).map(p => `
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 font-semibold text-slate-300">${p.name}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="text-rose-400 font-bold">${p.stock_quantity} units</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-xs font-bold text-indigo-400 hover:underline">RESTOCK</button>
+                            </td>
+                        </tr>
+                    `).join('') || '<tr><td colspan="3" class="p-10 text-center text-emerald-500/50">All items in stock</td></tr>';
 
-                    // Top Customers
-                    const topCustomers = document.getElementById('top_customers');
-                    if (data.top_customers?.length > 0) {
-                        topCustomers.innerHTML = data.top_customers.map((c, i) => `
-                            <div class="flex justify-between items-center p-3 bg-blue-50 rounded">
-                                <div>
-                                    <p class="font-semibold">${i + 1}. ${c.name}</p>
-                                    <p class="text-sm text-gray-600">${c.order_count} order</p>
-                                </div>
-                                <p class="text-lg font-bold text-blue-600">฿${(c.total_spent || 0).toLocaleString('th-TH')}</p>
+                    // VIP Customers
+                    const customersDiv = document.getElementById('top_customers');
+                    customersDiv.innerHTML = (data.top_customers || []).slice(0, 4).map(c => `
+                        <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <div>
+                                <p class="font-bold text-slate-200">${c.name}</p>
+                                <p class="text-[10px] text-slate-500 font-bold">${c.order_count} ORDERS</p>
                             </div>
-                        `).join('');
-                    }
-
-                    // Active Coupons
-                    const activeCoupons = document.getElementById('active_coupons');
-                    try {
-                        const couponsRes = await fetch(`${API_BASE}/coupons`);
-                        const couponsData = await couponsRes.json();
-                        if (couponsData.success && couponsData.data?.length > 0) {
-                            activeCoupons.innerHTML = couponsData.data.slice(0, 5).map(c => `
-                                <div class="flex justify-between items-center p-3 bg-green-50 rounded">
-                                    <div>
-                                        <p class="font-semibold">${c.code}</p>
-                                        <p class="text-sm text-gray-600">${c.name}</p>
-                                    </div>
-                                    <p class="text-lg font-bold text-green-600">${c.discount_value}%</p>
-                                </div>
-                            `).join('');
-                        }
-                    } catch (e) {
-                        console.error('Coupon load error:', e);
-                    }
-
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
+                            <p class="font-bold text-indigo-400">฿${formatThaiNumber(c.total_spent)}</p>
+                        </div>
+                    `).join('') || '<p class="text-slate-500 text-center">No customer data</p>';
                 }
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-                document.getElementById('loading').innerHTML = `
-                    <div class="text-red-600">
-                        <p class="text-xl font-bold">❌ ข้อผิดพลาด</p>
-                        <p class="text-sm mt-2">${error.message}</p>
-                        <p class="text-xs text-gray-600 mt-2">ตรวจสอบว่า API Server กำลังทำงาน (http://localhost:5001)</p>
-                    </div>
-                `;
+            } catch (err) {
+                console.error("Dashboard failed:", err);
             }
         }
 
-        // Auto-refresh every 30 seconds
+        async function sendAIChat() {
+            const input = document.getElementById('chat-input');
+            const messagesContainer = document.getElementById('chat-messages');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // User UI
+            const userMsg = document.createElement('div');
+            userMsg.className = 'user-bubble message p-4 text-sm ml-auto max-w-[85%] shadow-lg';
+            userMsg.textContent = text;
+            messagesContainer.appendChild(userMsg);
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Loading UI
+            const loading = document.createElement('div');
+            loading.className = 'ai-bubble message p-4 text-sm text-slate-400 italic';
+            loading.textContent = '🤖 AI กำลังประมวลผล...';
+            messagesContainer.appendChild(loading);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await response.json();
+                
+                loading.remove();
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'ai-bubble message p-4 text-sm text-slate-200 shadow-md';
+                aiMsg.innerHTML = data.success ? data.reply.replace(/\n/g, '<br>') : `❌ ขออภัย: ${data.error}`;
+                messagesContainer.appendChild(aiMsg);
+
+                if (text.includes('แก้') || text.includes('เปลี่ยน') || text.includes('สร้าง') || text.includes('อัพเดท')) {
+                    setTimeout(loadDashboard, 1000);
+                }
+            } catch (err) {
+                loading.textContent = '❌ ขัดข้อง: ไม่สามารถติดต่อ AI ได้';
+            }
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Initialize and Refresh
         loadDashboard();
         setInterval(loadDashboard, 30000);
     </script>
